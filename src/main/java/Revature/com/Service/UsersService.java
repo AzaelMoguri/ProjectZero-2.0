@@ -16,8 +16,7 @@ public class UsersService {
                 return usersDAO.getAllUsers();
         }
 // ---------------------------------------------------------------------------------
-        public Users addUser (Users user){
-
+        public Users registerUser(Users user){
                 usersDAO.createUser(user);
                 return user;
         }

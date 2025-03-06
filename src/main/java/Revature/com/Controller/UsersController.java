@@ -22,7 +22,7 @@ public class UsersController {
     public void registerUser (Context ctx) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         Users user = mapper.readValue(ctx.body(), Users.class);
-        Users addedUser = usersService.addUser(user);
+        Users addedUser = usersService.registerUser(user);
         if (addedUser == null){
             ctx.status(400);
         } else {
