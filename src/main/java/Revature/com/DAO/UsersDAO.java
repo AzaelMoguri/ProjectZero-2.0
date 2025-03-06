@@ -68,16 +68,15 @@ public class UsersDAO {
     public void updateUser(Users users){
         Connection connection = ConnectionUtil.getConnection();
         try{
-            String sql = "UPDATE users SET name = ?, ssn = ?, phonenum = ?, age = ?, salaryavg = ?, id_address = ?, id_account = ? WHERE user_id = ? ";
+            String sql = "UPDATE users SET name = ?, password = ?, phonenum = ?, age = ?, salaryavg = ?, id_account = ? WHERE user_id = ? ";
             PreparedStatement stmt = connection.prepareStatement(sql);
             stmt.setString(1, users.getName());
-            stmt.setString(2,users.getSsn());
+            stmt.setString(2,users.getPassword());
             stmt.setString(3,users.getPhonenum());
             stmt.setInt(4,users.getAge());
             stmt.setFloat(5,users.getSalaryavg());
-            stmt.setInt(6,users.getIdAddress());
-            stmt.setInt(7, users.getIdAccount());
-            stmt.setInt(8,users.getUserId());
+            stmt.setInt(6, users.getIdAccount());
+            stmt.setInt(7,users.getUserId());
             stmt.executeUpdate();
 
         } catch (SQLException e){

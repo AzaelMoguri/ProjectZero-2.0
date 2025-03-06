@@ -36,9 +36,11 @@ public class Main {
         app.get("/users/{user_id}",usersController::getUserbyId);
         app.put("/users/{user_id}",usersController::updateUser);
         app.get("/loans",loanController::getAllLoans);
-        app.get("/loans/{id_loan}",loanController::getAllLoansforUser);
-        app.post("/createLoan",loanController::createLoan);
-        app.put("/loans/{id_loan}",loanController::updateLoan); // 2 REQUIREMENT
+        app.get("/loan/{user_id}",loanController::getLoanUser);
+        app.get("/loans/{id_loan}",loanController::getLoanManager);
+        app.post("/loan",loanController::createLoan);
+        app.put("/loan/{id_loan}",loanController::updateLoan);
+        app.put("/loanStatus/{id_loan}",loanController::statusLoan); // 2 REQUIREMENT
 
     // -----------------------------------------------------------------------------------
         app.get("/Address", addressController::getAllAddress);

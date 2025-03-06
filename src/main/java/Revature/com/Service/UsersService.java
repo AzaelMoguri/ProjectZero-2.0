@@ -8,9 +8,14 @@ import java.util.List;
 public class UsersService {
         private  final UsersDAO usersDAO;
 
+        public UsersService(){
+                usersDAO = new UsersDAO();
+        }
+
         public UsersService(UsersDAO usersDAO) {
                 this.usersDAO = usersDAO;
         }
+
 
         public List<Users> getAllUsers(){
                 return usersDAO.getAllUsers();
@@ -30,13 +35,15 @@ public class UsersService {
                 return  usersDAO.getUserById(userId);
         }
 // ---------------------------------------------------------------------------------------------
-        public boolean loginUser(String email, String rawpassword){
+        public Users loginUser(String email, String rawpassword){
                 Users existingUser = usersDAO.getUserByEmail(email);
                 if(existingUser ==null){
-                        return false; //users not found
+                        return null; //users not found
                 }
-                rawpassword.equals(existingUser);
-                return rawpassword.equals(existingUser.getPassword());
+                if (rawpassword.equals(existingUser.getPassword())){
+                        return existingUser;
+                }
+                return null;
         }
 
 }

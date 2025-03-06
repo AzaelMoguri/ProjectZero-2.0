@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class LoansService {
-    private LoansDAO loansDAO = new LoansDAO();
+    private final LoansDAO loansDAO;
 
     public LoansService(LoansDAO loansDAO){
         this.loansDAO = loansDAO;
@@ -38,6 +38,10 @@ public class LoansService {
     //--------------------------------------------
 
 
+    public Loan statusLoan(Loan loan){
+        loansDAO.statusLoan(loan);
+        return loan;
+    }
     public Loan updateLoan(Loan loan){
         loansDAO.updateLoan(loan);
         return loan;

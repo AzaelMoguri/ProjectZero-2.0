@@ -36,6 +36,7 @@ public class LoansDAO {
         try {
             String sql = "SELECT * FROM loan WHERE user_id = ?";
             PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setInt(1,userId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()){
                 Loan newloan = new Loan(
@@ -98,20 +99,30 @@ public class LoansDAO {
         }        return loans;
 
     }
-    public void updateLoan(Loan loan){
+    public void statusLoan(Loan loan){
         Connection connection = ConnectionUtil.getConnection();
         try{
-            String sql = "UPDATE loan SET quantity = ?, status = ?, application_date = ? WHERE id_loan = ?";
+            String sql = "UPDATE loan SET status = ? WHERE id_loan = ?";
             PreparedStatement stmt = connection.prepareStatement(sql);
-            stmt.setFloat(1,loan.getQuantity());
-            stmt.setBoolean(2, loan.isStatus());
-            stmt.setString(3,loan.getApplicationDate());
-            stmt.setInt(4,loan.getIdLoan());
+            stmt.setBoolean(1, loan.isStatus());
+            stmt.setInt(2,loan.getIdLoan());
             stmt.executeUpdate();
         }catch (SQLException e){
             System.out.println(e.getMessage());
         }
+    }
 
+    public void updateLoan(Loan loan){
+        Connection connection = ConnectionUtil.getConnection();
+        try {
+            String sql ="UPDATE loan SET quantity = ? WHERE id_loan = ?";
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setFloat(1,loan.getQuantity());
+            stmt.setInt(2,loan.getIdLoan());
+            stmt.executeUpdate();
+        } catch (SQLException e){
+            System.out.println(e.getMessage());
+        }
     }
 
 }

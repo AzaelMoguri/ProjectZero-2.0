@@ -15,6 +15,11 @@ public class UsersController {
 
     public UsersController(UsersService usersService){this.usersService = usersService;}
 
+    public UsersController(){
+        usersService = new UsersService();
+    }
+
+
     public void getAllUsers(Context ctx){
         ctx.json(usersService.getAllUsers());
     }
@@ -30,38 +35,42 @@ public class UsersController {
             ctx.json(mapper.writeValueAsString(addedUser));
         }
     }
+
+
     public void updateUser (Context ctx){
-    int userID = Integer.parseInt(ctx.pathParam("user_id"));
+        if(checkLoginn(ctx)){
+
+        } else {
+            ctx.status(400).json("{\"error\":\"Mis\"}");
+
+        }
+        int userID = Integer.parseInt(ctx.pathParam("user_id"));
     UsersDTO request = ctx.bodyAsClass(UsersDTO.class);
+        Users user = new Users();
+    if(request.getName() == null || request.getPassword() == null || request.getPhonenum() == null || request.getAge() == 0
+    || request.getSalaryavg() == 0 || request.getIdAccount() == 0){
+        ctx.status(400).json("{\"error\":\"Missing user information to update\"}");
 
-    Users user = new Users();
-    user.setUserId(userID);
-    user.setName(request.getName());
-    user.setEmail(request.getEmail());
-    user.setPassword(request.getPassword());
-    user.setSsn(request.getSsn());
-    user.setPhonenum(request.getPhonenum());
-    user.setAge(request.getAge());
-    user.setSalaryavg(request.getSalaryavg());
-    user.setIdAddress(request.getIdAddress());
-    user.setIdAccount(request.getIdAccount());
-
-    usersService.updateUser(user);
-    ctx.status(200).json("{\"message\":\"User updated\"}");
+    } else{
+        user.setUserId(userID);
+        user.setName(request.getName());
+        user.setPassword(request.getPassword());
+        user.setPhonenum(request.getPhonenum());
+        user.setAge(request.getAge());
+        user.setSalaryavg(request.getSalaryavg());
+        user.setIdAccount(request.getIdAccount());
+        usersService.updateUser(user);
+        ctx.status(200).json("{\"message\":\"User updated\"}");
     }
 
-    public void getUserbyId(Context ctx){
-        if (UsersController.checkLoginn(ctx)){
-            HttpSession session = ctx.req().getSession(false);
-            if(session != null && session.getAttribute("id_account") !=null &&session.getAttribute("id_account").equals(2)){
+
+    }
+
+    public void getUserbyId(Context ctx) {
                 int userId = Integer.parseInt(ctx.pathParam("user_id"));
                 List<Users> userbyId = usersService.getUserbyId(userId);
                 ctx.json(userbyId);
-            }
-        }else {
-            ctx.status(200).json("{\"message\":\"You haven't login\"}");
 
-        }
     }
 
     public void login(Context ctx){
@@ -70,10 +79,10 @@ public class UsersController {
             ctx.status(400).json("{\"error\":\"Missing username, password or id account \"}");
             return;
         }
-        boolean success = usersService.loginUser(user.getEmail(), user.getPassword());
-        if (success){
+        Users success = usersService.loginUser(user.getEmail(), user.getPassword());
+        if (success != null){
             HttpSession session = ctx.req().getSession(true);
-            session.setAttribute("email",user);
+            session.setAttribute("user",success);
             ctx.status(200).json("{\"message\":\"Login successful\"}");
         } else {
             ctx.status(401).json("{\"error\":\"Invalid credentials\"}");
@@ -82,7 +91,7 @@ public class UsersController {
     }
     public void checkLogin (Context ctx){
         HttpSession session = ctx.req().getSession(false);
-        if (session != null && session.getAttribute("email") !=null){
+        if (session != null && session.getAttribute("user") !=null){
             ctx.status(200).json("{\"message\":\"You are logged in\"}");
         } else {
             ctx.status(401).json("{\"error\":\"Not logged in\"}");
@@ -90,9 +99,9 @@ public class UsersController {
 
 
         }
-    public static boolean checkLoginn (Context ctx){
+    public boolean checkLoginn (Context ctx){
         HttpSession session = ctx.req().getSession(false);
-        if (session != null && session.getAttribute("email") !=null){
+        if (session != null && session.getAttribute("user") !=null){
             ctx.status(200).json("{\"message\":\"You are logged in\"}");
             return  true;
         } else {
@@ -102,12 +111,33 @@ public class UsersController {
 
 
     }
-        public  void logout (Context ctx){
+    public void logout (Context ctx){
             HttpSession session = ctx.req().getSession(false);
             if (session != null){
                 session.invalidate();
             }
             ctx.status(200).json("{\"message\":\"Logged out\"}");
         }
+
+    public int getRole(Context ctx){
+        HttpSession session = ctx.req().getSession(false);
+        if(session != null && session.getAttribute("user")!= null){
+            Users user = (Users) session.getAttribute("user");
+           return user.getIdAccount();
+        }
+        return -1;
     }
+
+    public int getUserId(Context ctx){
+        HttpSession session = ctx.req().getSession(false);
+        if (session != null && session.getAttribute("user")!= null){
+            Users users = (Users) session.getAttribute("user");
+            return  users.getUserId();
+        }
+        return -1;
+    }
+
+
+    }
+
 

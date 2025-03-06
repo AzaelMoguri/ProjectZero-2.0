@@ -13,6 +13,7 @@ import static org.mockito.Mockito.*;
 class UserServiceTest {
     private UsersDAO userDaoMock;
     private UsersService userService;
+
     @BeforeEach
     void setUp(){
         userDaoMock = Mockito.mock(UsersDAO.class);
