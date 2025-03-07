@@ -41,29 +41,28 @@ public class UsersController {
 
     public void updateUser (Context ctx){
         if(checkLoginn(ctx)){
+            int userID = Integer.parseInt(ctx.pathParam("user_id"));
+            UsersDTO request = ctx.bodyAsClass(UsersDTO.class);
+            Users user = new Users();
+            if(request.getName() == null || request.getPassword() == null || request.getPhonenum() == null || request.getAge() == 0
+                    || request.getSalaryavg() == 0 || request.getIdAccount() == 0){
+                ctx.status(400).json("{\"error\":\"Missing user information to update\"}");
+
+            } else{
+                user.setUserId(userID);
+                user.setName(request.getName());
+                user.setPassword(request.getPassword());
+                user.setPhonenum(request.getPhonenum());
+                user.setAge(request.getAge());
+                user.setSalaryavg(request.getSalaryavg());
+                user.setIdAccount(request.getIdAccount());
+                usersService.updateUser(user);
+                ctx.status(200).json("{\"message\":\"User updated\"}");
+            }
 
         } else {
-            ctx.status(400).json("{\"error\":\"Mis\"}");
-
+            ctx.status(400).json("{\"error\":\"You are not logged in\"}");
         }
-        int userID = Integer.parseInt(ctx.pathParam("user_id"));
-    UsersDTO request = ctx.bodyAsClass(UsersDTO.class);
-        Users user = new Users();
-    if(request.getName() == null || request.getPassword() == null || request.getPhonenum() == null || request.getAge() == 0
-    || request.getSalaryavg() == 0 || request.getIdAccount() == 0){
-        ctx.status(400).json("{\"error\":\"Missing user information to update\"}");
-
-    } else{
-        user.setUserId(userID);
-        user.setName(request.getName());
-        user.setPassword(request.getPassword());
-        user.setPhonenum(request.getPhonenum());
-        user.setAge(request.getAge());
-        user.setSalaryavg(request.getSalaryavg());
-        user.setIdAccount(request.getIdAccount());
-        usersService.updateUser(user);
-        ctx.status(200).json("{\"message\":\"User updated\"}");
-    }
 
 
     }
@@ -76,23 +75,20 @@ public class UsersController {
     }
 
     public void login(Context ctx){
-
         Users user = ctx.bodyAsClass(Users.class);
         if (user.getEmail() == null || user.getPassword() == null){
             ctx.status(400).json("{\"error\":\"Missing username, password or id account \"}");
             return;
         }
-        if(PasswordHash.comparePasswords(user.getPassword(), )){
-
-        }
-        Users success = usersService.loginUser(user.getEmail(), user.getPassword());
-        if (success != null){
+        boolean success = usersService.loginUser(user.getEmail(), user.getPassword());
+        if (success){
             HttpSession session = ctx.req().getSession(true);
-            session.setAttribute("user",success);
+            session.setAttribute("email",user);
             ctx.status(200).json("{\"message\":\"Login successful\"}");
         } else {
             ctx.status(401).json("{\"error\":\"Invalid credentials\"}");
         }
+
     }
 
     public void checkLogin (Context ctx){
