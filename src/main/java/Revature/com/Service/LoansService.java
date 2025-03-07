@@ -26,7 +26,7 @@ public class LoansService {
 
     //--------------------------------------------
 
-    public List<Loan> getLoanbyId(int loanId){
+    public Loan getLoanbyId(int loanId){
         return loansDAO.getLoanById(loanId);
     }
     //--------------------------------------------

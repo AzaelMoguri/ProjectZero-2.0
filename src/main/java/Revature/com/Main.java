@@ -30,14 +30,13 @@ public class Main {
         Javalin app = Javalin.create(javalinConfig -> {}).start(7070);
         app.post("/register",usersController::registerUser); // REQUIREMENT
         app.post("/login",usersController::login); // REQUIREMENT
-        app.get("/login", usersController::checkLogin);
+        app.get("/login", usersController::checkLoginn);
         app.post("logout",usersController::logout); // REQUIREMENT
         app.get("/users",usersController::getAllUsers);
         app.get("/users/{user_id}",usersController::getUserbyId);
         app.put("/users/{user_id}",usersController::updateUser);
         app.get("/loans",loanController::getAllLoans);
         app.get("/loan/{user_id}",loanController::getLoanUser);
-        app.get("/loans/{id_loan}",loanController::getLoanManager);
         app.post("/loan",loanController::createLoan);
         app.put("/loan/{id_loan}",loanController::updateLoan);
         app.put("/loanStatus/{id_loan}",loanController::statusLoan); // 2 REQUIREMENT

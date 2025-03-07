@@ -34,7 +34,7 @@ public class UsersService {
         }
         // ----------------------------------------------------------------------------------
 
-        public List<Users> getUserbyId(int userId) {
+        public Users getUserbyId(int userId) {
                 return usersDAO.getUserById(userId);
         }
 
@@ -48,10 +48,9 @@ public class UsersService {
                 return rawpassword.equals(existingUser.getPassword());
         }
 
-        public String userGetPassword(String user){
-                return usersDAO.getPasswordHash1(user);
+        public Users getAccountFromDB(String email) {
+                return usersDAO.getUserByEmail(email);
         }
-
 }
 
 

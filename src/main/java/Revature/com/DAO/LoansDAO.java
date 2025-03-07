@@ -75,24 +75,24 @@ public class LoansDAO {
             System.out.println(e.getMessage());
         }
     }
-    public  List<Loan> getLoanById(int loanId){
-        List<Loan> loans = new ArrayList<>();
+    public  Loan getLoanById(int loanId){
+         Loan loans = null;
         Connection connection = ConnectionUtil.getConnection();
         try {
             String sql = "SELECT * FROM loan WHERE id_loan = ?";
             PreparedStatement stmt = connection.prepareStatement(sql);
             stmt.setInt(1,loanId);
             try (ResultSet rs = stmt.executeQuery()){
-                while ( (rs.next())){
-                        Loan t = new Loan(
-                              rs.getInt("id_loan"),
-                                rs.getFloat("quantity"),
-                                rs.getBoolean("status"),
-                                rs.getString("application_date"),
-                                rs.getInt("user_id")
-                        );
-                        loans.add(t);
-                }
+                        if(rs.next()){
+                            loans = new Loan(
+                                    rs.getInt("id_loan"),
+                                    rs.getFloat("quantity"),
+                                    rs.getBoolean("status"),
+                                    rs.getString("application_date"),
+                                    rs.getInt("user_id")
+                            );
+                        }
+
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());

@@ -3,34 +3,34 @@ package Revature.com.Controller;
 import Revature.com.DTO.UsersDTO;
 import Revature.com.Model.Users;
 import Revature.com.Service.UsersService;
-import Revature.com.Util.PasswordHash;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.javalin.http.Context;
 import jakarta.servlet.http.HttpSession;
-import org.postgresql.util.PasswordUtil;
 
 import java.util.List;
 
 public class UsersController {
     private final UsersService usersService;
 
-    public UsersController(UsersService usersService){this.usersService = usersService;}
+    public UsersController(UsersService usersService) {
+        this.usersService = usersService;
+    }
 
-    public UsersController(){
+    public UsersController() {
         usersService = new UsersService();
     }
 
 
-    public void getAllUsers(Context ctx){
+    public void getAllUsers(Context ctx) {
         ctx.json(usersService.getAllUsers());
     }
 
-    public void registerUser (Context ctx) throws JsonProcessingException {
+    public void registerUser(Context ctx) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         Users user = mapper.readValue(ctx.body(), Users.class);
         Users addedUser = usersService.registerUser(user);
-        if (addedUser == null){
+        if (addedUser == null) {
             ctx.status(400);
         } else {
             ctx.status(200).json("{\"message\":\"Registered user\"}");
@@ -39,16 +39,16 @@ public class UsersController {
     }
 
 
-    public void updateUser (Context ctx){
-        if(checkLoginn(ctx)){
+    public void updateUser(Context ctx) {
+        if (checkLoginn(ctx)) {
             int userID = Integer.parseInt(ctx.pathParam("user_id"));
             UsersDTO request = ctx.bodyAsClass(UsersDTO.class);
             Users user = new Users();
-            if(request.getName() == null || request.getPassword() == null || request.getPhonenum() == null || request.getAge() == 0
-                    || request.getSalaryavg() == 0 || request.getIdAccount() == 0){
+            if (request.getName() == null || request.getPassword() == null || request.getPhonenum() == null || request.getAge() == 0
+                    || request.getSalaryavg() == 0 || request.getIdAccount() == 0) {
                 ctx.status(400).json("{\"error\":\"Missing user information to update\"}");
 
-            } else{
+            } else {
                 user.setUserId(userID);
                 user.setName(request.getName());
                 user.setPassword(request.getPassword());
@@ -67,48 +67,66 @@ public class UsersController {
 
     }
 
-    public void getUserbyId(Context ctx) {
-                int userId = Integer.parseInt(ctx.pathParam("user_id"));
-                List<Users> userbyId = usersService.getUserbyId(userId);
-                ctx.json(userbyId);
-
+    public int getUserbyId(Context ctx) {
+              HttpSession session = ctx.req().getSession(false);
+              if(session != null && session.getAttribute("userId")!= null){
+                  int userId = (int) session.getAttribute("userId");
+                  Users users = usersService.getUserbyId(userId);
+                  return users.getUserId();
+              }
+    return -1;
     }
 
-    public void login(Context ctx){
+    public void login(Context ctx) {
         Users user = ctx.bodyAsClass(Users.class);
-        if (user.getEmail() == null || user.getPassword() == null){
+        UsersDTO account = ctx.bodyAsClass(UsersDTO.class);
+        if (account.getEmail() == null || account.getPassword() == null){
             ctx.status(400).json("{\"error\":\"Missing username, password or id account \"}");
             return;
         }
-        boolean success = usersService.loginUser(user.getEmail(), user.getPassword());
-        if (success){
+        Users infoUser = usersService.getAccountFromDB(user.getEmail());
+
+        if (infoUser != null){
             HttpSession session = ctx.req().getSession(true);
-            session.setAttribute("email",user);
-            ctx.status(200).json("{\"message\":\"Login successful\"}");
+            session.setAttribute("user",infoUser);
+            session.setAttribute("userId",infoUser.getUserId());
+            session.setAttribute("name",infoUser.getName());
+            session.setAttribute("email",infoUser.getEmail());
+            session.setAttribute("ssn",infoUser.getSsn());
+            session.setAttribute("phonenum",infoUser.getPhonenum());
+            session.setAttribute("age", infoUser.getAge());
+            session.setAttribute("idAddress", infoUser.getIdAddress());
+            session.setAttribute("idAccount",infoUser.getIdAccount());
+            ctx.status(200).json("{\"message\":\"Login succesfull\"}");
+            return;
         } else {
             ctx.status(401).json("{\"error\":\"Invalid credentials\"}");
+        }
+        if (!infoUser.getPassword().equals(user.getPassword())){
+            ctx.status(401).json("{\"error\":\"Invalid credentials\"}");
+
         }
 
     }
 
     public void checkLogin (Context ctx){
         HttpSession session = ctx.req().getSession(false);
-        if (session != null && session.getAttribute("user") !=null){
+        if (session != null && session.getAttribute("email") !=null){
             ctx.status(200).json("{\"message\":\"You are logged in\"}");
         } else {
-            ctx.status(401).json("{\"error\":\"Not logged in\"}");
+            ctx.status(401).json("{\"message\":\"Not logged in\"}");
         }
+    }
 
 
-        }
     public boolean checkLoginn (Context ctx){
         HttpSession session = ctx.req().getSession(false);
-        if (session != null && session.getAttribute("user") !=null){
+        if (session != null && session.getAttribute("email") !=null){
             ctx.status(200).json("{\"message\":\"You are logged in\"}");
-            return  true;
+            return true;
         } else {
             ctx.status(401).json("{\"error\":\"Not logged in\"}");
-            return  false;
+            return false;
         }
 
 
@@ -117,23 +135,24 @@ public class UsersController {
             HttpSession session = ctx.req().getSession(false);
             if (session != null){
                 session.invalidate();
+                System.out.println("Session is null");
             }
             ctx.status(200).json("{\"message\":\"Logged out\"}");
         }
 
     public int getRole(Context ctx){
         HttpSession session = ctx.req().getSession(false);
-        if(session != null && session.getAttribute("user")!= null){
-            Users user = (Users) session.getAttribute("user");
-           return user.getIdAccount();
+        if(session != null && session.getAttribute("idAccount")!= null){
+                return (int) session.getAttribute("idAccount");
         }
         return -1;
     }
 
     public int getUserId(Context ctx){
         HttpSession session = ctx.req().getSession(false);
-        if (session != null && session.getAttribute("user")!= null){
-            Users users = (Users) session.getAttribute("user");
+        if (session != null && session.getAttribute("userId")!= null){
+            int accountId = (int) session.getAttribute("userId");
+            Users users = usersService.getUserbyId(accountId);
             return  users.getUserId();
         }
         return -1;

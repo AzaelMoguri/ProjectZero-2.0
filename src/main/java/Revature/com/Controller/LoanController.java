@@ -8,11 +8,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.javalin.http.Context;
 
 import java.sql.SQLException;
-import java.util.List;
 
 public class LoanController {
     private final LoansService loansService;
     private final UsersController usersController;
+
 
 
     public LoanController(LoansService loansService){
@@ -22,11 +22,10 @@ public class LoanController {
 
 
     public void  getAllLoans(Context ctx){
-
         if(usersController.getRole(ctx) == 1){
             ctx.json(loansService.getAllLoans());
         } else {
-            ctx.status(200).json("{\"message\":\"You are not authorized\"}");
+            ctx.status(400).json("{\"message\":\"You are not authorized\"}");
         }
 
     }
@@ -35,7 +34,7 @@ public class LoanController {
 
     public void createLoan (Context ctx) throws JsonProcessingException {
             if (usersController.checkLoginn(ctx)) {
-                if (usersController.getRole(ctx) == 2) {
+               if (usersController.getRole(ctx) == 2) {
                     ObjectMapper mapper = new ObjectMapper();
                     Loan loan = mapper.readValue(ctx.body(), Loan.class);
                     Loan addedLoan = loansService.addLoan(loan);
@@ -45,44 +44,44 @@ public class LoanController {
                         ctx.json(mapper.writeValueAsString(addedLoan));
                     }
                 } else {
-                    ctx.status(200).json("{\"message\":\"You are not authorized\"}");
+
+                  ctx.status(200).json("{\"message\":\"You are not authorized\"}");
+                   System.out.println(usersController.getRole(ctx));
 
                 }
             }else {
                 ctx.status(200).json("{\"message\":\"You havent login\"}");
 
             }
+
     }
 
     //--------------------------------------------
 
-    public void getLoanManager(Context ctx){
-        if(usersController.getRole(ctx) == 1){
-            int loanId = Integer.parseInt(ctx.pathParam("id_loan"));
-            List<Loan> loanbyId = loansService.getLoanbyId(loanId);
-            ctx.json(loanbyId);
-        } else {
-            ctx.status(200).json("{\"message\":\"You are not authorized\"}");
-        }
 
-    }
+// -----------------------------------
 
     public void getLoanUser (Context ctx) throws SQLException {
-        if(usersController.checkLoginn(ctx)){
+        if (usersController.checkLoginn(ctx)) {
             int userID = Integer.parseInt(ctx.pathParam("user_id"));
-            if(usersController.getUserId(ctx) == userID){
-                List<Loan> loanUser = loansService.getLoansForUser(userID);
-                ctx.json(loanUser);
+            Loan loan = loansService.getLoanbyId(userID);
+            if (usersController.getUserId(ctx) == userID) {
+                // Users users
+                if(loan.getUserId() == usersController.getUserId(ctx)){
+                    ctx.json(loan);
+                } else {
+                    ctx.status(404).json("{\"message\":\"You do not own this loan\"}");
+
+                }
             }else {
-                ctx.status(200).json("{\"message\":\"You are not authorized\"}");
-
+                ctx.json(loan);
             }
-            }else{
-            ctx.status(200).json("{\"message\":\"You haven't log in\"}");
+
+        }else {
+            ctx.status(401).json("{\"error\":\"You havent log in\"}");
 
         }
-
-        }
+    }
 
     //--------------------------------------------
 
