@@ -68,7 +68,6 @@ public class LoanController {
     }
 
     public void getLoanUser (Context ctx) throws SQLException {
-
         if(usersController.checkLoginn(ctx)){
             int userID = Integer.parseInt(ctx.pathParam("user_id"));
             if(usersController.getUserId(ctx) == userID){
@@ -90,6 +89,7 @@ public class LoanController {
     public void updateLoan(Context ctx){
         if(usersController.checkLoginn(ctx)){
         int loanID = Integer.parseInt(ctx.pathParam("id_loan"));
+            Loan loans = ctx.bodyAsClass(Loan.class);
         if(usersController.getUserId(ctx) == loanID){
             LoansDTO request = ctx.bodyAsClass(LoansDTO.class);
             Loan loan = new Loan();
@@ -99,7 +99,7 @@ public class LoanController {
             ctx.status(200).json("{\"message\":\"Loan updated\"}");
         }else {
             ctx.status(401).json("{\"error\":\"You cant update this loan because its not yours\"}");
-
+            System.out.println(loans.getUserId());
         }
 
         } else {

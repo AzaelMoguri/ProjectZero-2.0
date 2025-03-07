@@ -2,13 +2,14 @@ package Revature.com.Service;
 
 import Revature.com.DAO.UsersDAO;
 import Revature.com.Model.Users;
+import Revature.com.Util.PasswordHash;
 
 import java.util.List;
 
 public class UsersService {
-        private  final UsersDAO usersDAO;
+        private final UsersDAO usersDAO;
 
-        public UsersService(){
+        public UsersService() {
                 usersDAO = new UsersDAO();
         }
 
@@ -17,36 +18,39 @@ public class UsersService {
         }
 
 
-        public List<Users> getAllUsers(){
+        public List<Users> getAllUsers() {
                 return usersDAO.getAllUsers();
         }
-// ---------------------------------------------------------------------------------
-        public Users registerUser(Users user){
+
+        // ---------------------------------------------------------------------------------
+        public Users registerUser(Users user) {
                 usersDAO.createUser(user);
                 return user;
         }
-  // --------------------------------------------------------------------------------
-        public void updateUser(Users user){
+
+        // --------------------------------------------------------------------------------
+        public void updateUser(Users user) {
                 usersDAO.updateUser(user);
         }
-  // ----------------------------------------------------------------------------------
+        // ----------------------------------------------------------------------------------
 
-        public List<Users> getUserbyId(int userId){
-                return  usersDAO.getUserById(userId);
+        public List<Users> getUserbyId(int userId) {
+                return usersDAO.getUserById(userId);
         }
-// ---------------------------------------------------------------------------------------------
-        public Users loginUser(String email, String rawpassword){
+
+        // ---------------------------------------------------------------------------------------------
+        public Users loginUser(String email, String rawpassword) {
                 Users existingUser = usersDAO.getUserByEmail(email);
-                if(existingUser ==null){
+                if (existingUser == null) {
                         return null; //users not found
                 }
-                if (rawpassword.equals(existingUser.getPassword())){
+                if (rawpassword.equals(existingUser.getPassword())) {
                         return existingUser;
                 }
                 return null;
-        }
+                }
+                }
 
-}
 
 
 

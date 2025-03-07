@@ -3,10 +3,12 @@ package Revature.com.Controller;
 import Revature.com.DTO.UsersDTO;
 import Revature.com.Model.Users;
 import Revature.com.Service.UsersService;
+import Revature.com.Util.PasswordHash;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.javalin.http.Context;
 import jakarta.servlet.http.HttpSession;
+import org.postgresql.util.PasswordUtil;
 
 import java.util.List;
 
@@ -74,6 +76,7 @@ public class UsersController {
     }
 
     public void login(Context ctx){
+
         Users user = ctx.bodyAsClass(Users.class);
         if (user.getEmail() == null || user.getPassword() == null){
             ctx.status(400).json("{\"error\":\"Missing username, password or id account \"}");
@@ -89,6 +92,7 @@ public class UsersController {
         }
 
     }
+
     public void checkLogin (Context ctx){
         HttpSession session = ctx.req().getSession(false);
         if (session != null && session.getAttribute("user") !=null){
