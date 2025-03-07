@@ -148,21 +148,21 @@ public class UsersDAO {
         }
 
 
-    public void getPasswordHash(Users user){
+    public String getPasswordHash(String password){
         Connection connection = ConnectionUtil.getConnection();
         try {
             String sql = "SELECT password FROM users WHERE email = ?";
             PreparedStatement stmt = connection.prepareStatement(sql);
-            stmt.setString(1,user.getPassword());
+            stmt.setString(1,user.getEmail());
             ResultSet rs = stmt.executeQuery();
             if (rs.next()){
                 rs.getString("password");
+                return rs.getString("password");
             }
         } catch (SQLException e){
             System.out.println(e.getMessage());
         }
-
-
+        return null;
     }
 
     }

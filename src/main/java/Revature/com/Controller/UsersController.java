@@ -82,6 +82,9 @@ public class UsersController {
             ctx.status(400).json("{\"error\":\"Missing username, password or id account \"}");
             return;
         }
+        if(PasswordHash.comparePasswords(user.getPassword(), )){
+
+        }
         Users success = usersService.loginUser(user.getEmail(), user.getPassword());
         if (success != null){
             HttpSession session = ctx.req().getSession(true);
@@ -90,7 +93,6 @@ public class UsersController {
         } else {
             ctx.status(401).json("{\"error\":\"Invalid credentials\"}");
         }
-
     }
 
     public void checkLogin (Context ctx){

@@ -6,14 +6,6 @@ import at.favre.lib.crypto.bcrypt.BCrypt;
 
 public class PasswordHash {
 
-    public class Hashing {
-
-        UsersDAO usersDAO;
-
-        public Hashing() {
-            this.usersDAO= new UsersDAO();
-        }
-
         public static String hashPassword(String password) {
             return BCrypt.withDefaults().hashToString(12, password.toCharArray());
         }
@@ -25,5 +17,5 @@ public class PasswordHash {
         }
 
     }
-    }
+
 

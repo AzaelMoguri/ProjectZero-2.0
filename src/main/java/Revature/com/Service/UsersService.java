@@ -24,6 +24,8 @@ public class UsersService {
 
         // ---------------------------------------------------------------------------------
         public Users registerUser(Users user) {
+                String password = PasswordHash.hashPassword(user.getPassword());
+                user.setPassword(password);
                 usersDAO.createUser(user);
                 return user;
         }
@@ -39,7 +41,7 @@ public class UsersService {
         }
 
         // ---------------------------------------------------------------------------------------------
-        public Users loginUser(String email, String rawpassword) {
+        public Users loginUser(String email, String rawpassword){
                 Users existingUser = usersDAO.getUserByEmail(email);
                 if (existingUser == null) {
                         return null; //users not found
@@ -49,7 +51,12 @@ public class UsersService {
                 }
                 return null;
                 }
-                }
+
+        public Users userGetPassword(String password){
+                return usersDAO.getPasswordHash(password);
+        }
+
+}
 
 
 
